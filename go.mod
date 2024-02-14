@@ -1,4 +1,4 @@
-module github.com/moveaxlab/deps-check
+module github.com/moveaxlab/dep-check
 
 go 1.20
 

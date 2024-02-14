@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/moveaxlab/deps-check/structure"
+	"github.com/moveaxlab/dep-check/structure"
 	"github.com/spf13/cobra"
 )
 

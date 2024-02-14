@@ -1,4 +1,4 @@
-# deps check
+# dep check
 
 This repo contains a tool to validate imports inside Go monorepos,
 and to run tests selectively based on changed files and imports structure.
@@ -6,7 +6,7 @@ and to run tests selectively based on changed files and imports structure.
 ## Installation
 
 ```bash
-go install github.com/moveaxlab/deps-check
+go install github.com/moveaxlab/dep-check
 ```
 
 ## Configuration
@@ -25,21 +25,21 @@ This tool distingueshes between 4 layers:
 ## Validating project structure
 
 ```bash
-deps-check validate
+dep-check validate
 ```
 
 ## Running tests selectively
 
-Get a list of changed files and feed it to `deps-check`:
+Get a list of changed files and feed it to `dep-check`:
 
 ```bash
-readarray -t PACKAGES < <(git diff --name-only "${TARGET_BRANCH}...${CURRENT_BRANCH}" | deps-check changed-packages)
+readarray -t PACKAGES < <(git diff --name-only "${TARGET_BRANCH}...${CURRENT_BRANCH}" | dep-check changed-packages)
 ```
 
 You can also run tests on staged files:
 
 ```bash
-readarray -t PACKAGES < <(git diff --staged --name-only | deps-check changed-packages)
+readarray -t PACKAGES < <(git diff --staged --name-only | dep-check changed-packages)
 ```
 
 Then, iterate over the changed packages and run your tests:

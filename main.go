@@ -1,6 +1,6 @@
 package main
 
-import "github.com/moveaxlab/deps-check/cmd"
+import "github.com/moveaxlab/dep-check/cmd"
 
 func main() {
 	cmd.Execute()

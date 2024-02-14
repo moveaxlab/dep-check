@@ -10,7 +10,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "deps",
+	Use:   "dep-check",
 	Short: "project structure and dependencies",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		log.SetOutput(os.Stderr)
@@ -29,7 +29,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	viper.SetConfigName("deps-check")
+	viper.SetConfigName("dep-check")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
