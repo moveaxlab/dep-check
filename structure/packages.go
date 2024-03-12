@@ -3,6 +3,7 @@ package structure
 import (
 	"fmt"
 	"io"
+	"path"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -90,7 +91,7 @@ func (s *baseStruct) match(pkgPath string, relPath string, typ PackageType) (mat
 		if hasWildcard {
 			name := strings.Split(strings.Replace(pkgPath, prefix, "", 1), "/")[0]
 			res = PackageInfo{
-				path: strings.Join([]string{prefix, name}, "/"),
+				path: path.Join(prefix, name),
 				name: name,
 				typ:  typ,
 			}

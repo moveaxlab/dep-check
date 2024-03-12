@@ -2,7 +2,6 @@ package structure
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"path"
 	"strings"
@@ -29,7 +28,7 @@ func (s *baseStruct) GetChangedPackages(r io.Reader) PackageSet {
 			return res
 		}
 
-		changedPath := fmt.Sprintf("%s/%s", s.base, changedFile)
+		changedPath := path.Join(s.base, changedFile)
 
 		if path.Dir(changedPath) == s.base {
 			log.Debugf("skipping root directory file %s", changedFile)

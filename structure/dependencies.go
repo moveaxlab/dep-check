@@ -117,12 +117,18 @@ func (t dependencyTree) ExpandDependencies(set PackageSet) {
 	for changed {
 		changed = false
 		for _, pkg := range set.Enumerate() {
-			for dep := range t.m[pkg] {
-				if !set.Contains(dep) {
-					log.Debugf("%s depends on %s", dep, pkg)
-					changed = true
-					set.Add(dep)
+			if deps, ok := t.m[pkg]; ok {
+				for dep := range deps {
+					if !set.Contains(dep) {
+						log.Debugf("%s depends on %s", dep, pkg)
+						changed = true
+						set.Add(dep)
+					}
 				}
+			} else {
+				log.Debugf("skipping invalid package %s", pkg)
+				set.Remove(pkg)
+				changed = true
 			}
 		}
 	}
