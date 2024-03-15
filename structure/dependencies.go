@@ -35,10 +35,10 @@ type DependencyTree interface {
 }
 
 func (s *baseStruct) BuildPackageTree(path string) ImportTree {
+	log.Debugf("building package tree from %s", path)
 	cfg := &packages.Config{}
 	cfg.Mode = packages.NeedImports | packages.NeedName
 	pkgs, err := packages.Load(cfg, path)
-	log.Debugf("%v", pkgs)
 	if err != nil {
 		panic(fmt.Errorf("failed to load packages: %w", err))
 	}
@@ -105,8 +105,10 @@ func (t packageTree) Enumerate() map[PackageInfo][]PackageInfo {
 }
 
 func (t dependencyTree) ExpandDependencies(set PackageSet) {
+	log.Debugf("expanding dependency tree")
+
 	if set.Contains(RootPkg) {
-		log.Debugf("detected root package change, adding all packages")
+		log.Debugf("detected root package change, adding all packages to dependency tree")
 		for pkg := range t.ToImportTree().Enumerate() {
 			set.Add(pkg)
 		}
@@ -120,15 +122,14 @@ func (t dependencyTree) ExpandDependencies(set PackageSet) {
 			if deps, ok := t.m[pkg]; ok {
 				for dep := range deps {
 					if !set.Contains(dep) {
-						log.Debugf("%s depends on %s", dep, pkg)
+						log.Debugf("package %s has package %s as a dependency, expanding tree", pkg, dep)
 						changed = true
 						set.Add(dep)
 					}
 				}
 			} else {
-				log.Debugf("skipping invalid package %s", pkg)
+				log.Debugf("package %s is invalid, skipping it", pkg)
 				set.Remove(pkg)
-				changed = true
 			}
 		}
 	}

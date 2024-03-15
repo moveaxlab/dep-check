@@ -38,7 +38,7 @@ var RootPkg = PackageInfo{
 }
 
 func (p PackageInfo) String() string {
-	return fmt.Sprintf("%s (%s)", p.name, p.typ)
+	return fmt.Sprintf("%s [%s]", p.name, p.typ)
 }
 
 func (p PackageInfo) Path() string {
@@ -102,7 +102,7 @@ func (s *baseStruct) match(pkgPath string, relPath string, typ PackageType) (mat
 				typ:  typ,
 			}
 		}
-		log.Debugf("found %s matched %s against %s with base %s", res, pkgPath, relPath, s.base)
+		log.Debugf("path %s belongs to package %s of type %s since it matches prefix %s", pkgPath, res, typ, prefix)
 		return true, res
 	}
 	return false, PackageInfo{}

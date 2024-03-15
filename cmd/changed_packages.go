@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/moveaxlab/dep-check/structure"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -13,10 +14,12 @@ var changedPackagesCommand = &cobra.Command{
 	Short: "detect changed packages from a git diff",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		baseStruct := structure.NewBaseStruct()
+
 		changedPackages := baseStruct.GetChangedPackages(os.Stdin)
 
 		if changedPackages.Contains(structure.RootPkg) {
-			fmt.Println(structure.RootPkg.Path())
+			log.Infof("change detected in root package")
+			fmt.Fprintln(os.Stdout, structure.RootPkg.Path())
 			return nil
 		}
 
@@ -26,7 +29,8 @@ var changedPackagesCommand = &cobra.Command{
 		dependencies.ExpandDependencies(changedPackages)
 
 		for _, pkg := range changedPackages.Enumerate() {
-			fmt.Println(pkg.Path())
+			log.Infof("change detected in package %s", pkg)
+			fmt.Fprintln(os.Stdout, pkg.Path())
 		}
 
 		return nil
