@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/moveaxlab/dep-check/structure"
 	log "github.com/sirupsen/logrus"
@@ -26,12 +27,15 @@ var changedServicesCommand = &cobra.Command{
 
 		dependencies.ExpandDependencies(changedServices)
 
+		var services []string
 		for _, pkg := range changedServices.Enumerate() {
 			if pkg.Type() == structure.Service {
-				log.Infof("change detected in service %s", pkg)
-				fmt.Fprintln(os.Stdout, pkg.Path())
+				services = append(services, pkg.Name())
 			}
 		}
+	
+		log.Println("changes detected for services", services)
+		fmt.Println(strings.Join(services, " "))
 
 		return nil
 	},
