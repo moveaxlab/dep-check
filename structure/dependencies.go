@@ -2,6 +2,7 @@ package structure
 
 import (
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/go/packages"
@@ -26,12 +27,36 @@ type PackageTree interface {
 type ImportTree interface {
 	PackageTree
 	ToDependencyTree() DependencyTree
+	PrintEnumerate() string
+}
+
+func (t importTree) PrintEnumerate() string {
+	res := ""
+	for pkg, imps := range t.Enumerate() {
+		res += fmt.Sprintf("%s:\n", pkg)
+		for _, imp := range imps {
+			res += fmt.Sprintf("\t%s\n", imp)
+		}
+	}
+	return res
 }
 
 type DependencyTree interface {
 	PackageTree
 	ToImportTree() ImportTree
 	ExpandDependencies(set PackageSet)
+	PrintEnumerate() string
+}
+
+func (t dependencyTree) PrintEnumerate() string {
+	res := ""
+	for pkg, deps := range t.Enumerate() {
+		res += fmt.Sprintf("%s:\n", pkg)
+		for _, dep := range deps {
+			res += fmt.Sprintf("\t%s\n", dep)
+		}
+	}
+	return res
 }
 
 func (s *baseStruct) BuildPackageTree(path string) ImportTree {
@@ -114,22 +139,27 @@ func (t dependencyTree) ExpandDependencies(set PackageSet) {
 		}
 		return
 	}
+	time.Sleep(10 * time.Second)
 
 	changed := true
+	visited := NewPackageSet()
 	for changed {
 		changed = false
+
 		for _, pkg := range set.Enumerate() {
-			if deps, ok := t.m[pkg]; ok {
-				for dep := range deps {
-					if !set.Contains(dep) {
-						log.Debugf("package %s has package %s as a dependency, expanding tree", pkg, dep)
-						changed = true
-						set.Add(dep)
-					}
+			deps, ok := t.m[pkg]
+			if !ok {
+				log.Debugf("package %s has no dependencies, skipping it", pkg)
+				continue
+			}
+
+			for dep := range deps {
+				if !visited.Contains(dep) && !set.Contains(dep) {
+					log.Debugf("package %s has package %s as a dependency, expanding tree", pkg, dep)
+					changed = true
+					set.Add(dep)
+					visited.Add(dep)
 				}
-			} else {
-				log.Debugf("package %s is invalid, skipping it", pkg)
-				set.Remove(pkg)
 			}
 		}
 	}
