@@ -2,8 +2,6 @@ package structure
 
 import (
 	"fmt"
-	"time"
-
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/go/packages"
 )
@@ -27,36 +25,12 @@ type PackageTree interface {
 type ImportTree interface {
 	PackageTree
 	ToDependencyTree() DependencyTree
-	PrintEnumerate() string
-}
-
-func (t importTree) PrintEnumerate() string {
-	res := ""
-	for pkg, imps := range t.Enumerate() {
-		res += fmt.Sprintf("%s:\n", pkg)
-		for _, imp := range imps {
-			res += fmt.Sprintf("\t%s\n", imp)
-		}
-	}
-	return res
 }
 
 type DependencyTree interface {
 	PackageTree
 	ToImportTree() ImportTree
 	ExpandDependencies(set PackageSet)
-	PrintEnumerate() string
-}
-
-func (t dependencyTree) PrintEnumerate() string {
-	res := ""
-	for pkg, deps := range t.Enumerate() {
-		res += fmt.Sprintf("%s:\n", pkg)
-		for _, dep := range deps {
-			res += fmt.Sprintf("\t%s\n", dep)
-		}
-	}
-	return res
 }
 
 func (s *baseStruct) BuildPackageTree(path string) ImportTree {
@@ -139,7 +113,6 @@ func (t dependencyTree) ExpandDependencies(set PackageSet) {
 		}
 		return
 	}
-	time.Sleep(10 * time.Second)
 
 	changed := true
 	visited := NewPackageSet()
