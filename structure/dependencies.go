@@ -2,7 +2,6 @@ package structure
 
 import (
 	"fmt"
-
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/go/packages"
 )
@@ -116,20 +115,24 @@ func (t dependencyTree) ExpandDependencies(set PackageSet) {
 	}
 
 	changed := true
+	visited := NewPackageSet()
 	for changed {
 		changed = false
+
 		for _, pkg := range set.Enumerate() {
-			if deps, ok := t.m[pkg]; ok {
-				for dep := range deps {
-					if !set.Contains(dep) {
-						log.Debugf("package %s has package %s as a dependency, expanding tree", pkg, dep)
-						changed = true
-						set.Add(dep)
-					}
+			deps, ok := t.m[pkg]
+			if !ok {
+				log.Debugf("package %s has no dependencies, skipping it", pkg)
+				continue
+			}
+
+			for dep := range deps {
+				if !visited.Contains(dep) && !set.Contains(dep) {
+					log.Debugf("package %s has package %s as a dependency, expanding tree", pkg, dep)
+					changed = true
+					set.Add(dep)
+					visited.Add(dep)
 				}
-			} else {
-				log.Debugf("package %s is invalid, skipping it", pkg)
-				set.Remove(pkg)
 			}
 		}
 	}
