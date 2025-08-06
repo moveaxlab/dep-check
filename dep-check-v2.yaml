@@ -1,0 +1,8 @@
+artifacts:
+  - common/cmd
+  - common/scripts/*
+  - toolbox
+  - common/src/*
+  - models/*
+  - external
+  - '*'

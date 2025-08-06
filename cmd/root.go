@@ -2,51 +2,41 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"log/slog"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "dep-check",
-	Short: "project structure and dependencies",
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		log.SetOutput(os.Stderr)
-		value, err := cmd.Flags().GetBool("debug")
-		if err != nil {
-			return fmt.Errorf("failed to check flags: %w", err)
-		}
-		if value {
-			log.SetLevel(log.DebugLevel)
-		}
-		return nil
-	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Usage()
-	},
-}
+const (
+	debugFlag = "debug"
+)
+
+var (
+	DebugMode = false
+	rootCmd   = &cobra.Command{
+		Use:   "dep-check",
+		Short: "Compute the dependency graph of a monorepo",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			debugFlagValue, err := cmd.Flags().GetBool(debugFlag)
+			if err != nil {
+				slog.Error(fmt.Sprint("Error reading flag", debugFlag))
+				panic(err)
+			}
+			if debugFlagValue {
+				DebugMode = debugFlagValue
+				slog.SetLogLoggerLevel(slog.LevelDebug)
+			}
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Usage()
+		},
+	}
+)
 
 func init() {
-	viper.SetConfigName("dep-check")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			viper.WriteConfig()
-		} else {
-			panic(err)
-		}
-	}
-	rootCmd.PersistentFlags().Bool("debug", false, "print debug messages")
+	rootCmd.PersistentFlags().Bool(debugFlag, false, "Add aditional information for debuing purpose")
 }
 
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
+	rootCmd.Execute()
 }
