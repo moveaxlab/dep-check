@@ -1,6 +1,6 @@
 module github.com/moveaxlab/dep-check
 
-go 1.26.0
+go 1.27.4
 
 require (
 	github.com/sirupsen/logrus v1.10.2
